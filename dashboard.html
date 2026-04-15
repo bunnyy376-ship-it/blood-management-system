@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <!-- Profile Info (Read-Only) -->
+    <div class="col-lg-4 mb-4">
+        <div class="card p-4 shadow-sm border-0 bg-danger text-white h-100">
+            <h4 class="mb-4 fw-bold">My Account</h4>
+            <div class="mb-3">
+                <small class="text-white-50 fw-bold text-uppercase">Full Name</small>
+                <div class="fs-5">{{ user['full_name'] }}</div>
+            </div>
+            <div class="mb-3">
+                <small class="text-white-50 fw-bold text-uppercase">Email</small>
+                <div class="fs-5">{{ user['email'] }}</div>
+            </div>
+            <div class="mb-3">
+                <small class="text-white-50 fw-bold text-uppercase">Pincode</small>
+                <div class="fs-5">{{ user['pincode'] }}</div>
+            </div>
+            <div class="mt-auto">
+                <div class="form-check form-switch pt-3 border-top border-light border-opacity-25">
+                    <input class="form-check-input" type="checkbox" role="switch" id="statusSwitch" disabled {% if user['is_available'] %}checked{% endif %}>
+                    <label class="form-check-label fw-bold" for="statusSwitch">
+                        {% if user['is_available'] %}
+                            <span class="text-light">Currently Available</span>
+                        {% else %}
+                            <span class="text-white-50">Currently Hidden</span>
+                        {% endif %}
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Donor Settings -->
+    <div class="col-lg-8">
+        <div class="card p-4 shadow-sm border-0 h-100">
+            <h4 class="mb-4 fw-bold">Update Donor Profile</h4>
+            <form action="/dashboard" method="POST">
+                
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label text-muted fw-bold">Blood Group</label>
+                        <select name="blood_group" class="form-select">
+                            <option value="">Not Specified</option>
+                            {% for bg in ["A+", "A-", "B+", "B-", "O+", "O-", "AB+", "AB-"] %}
+                                <option value="{{ bg }}" {% if user['blood_group'] == bg %}selected{% endif %}>{{ bg }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label text-muted fw-bold">Phone Number (For WhatsApp)</label>
+                        <input type="tel" name="phone" class="form-control" placeholder="10-digit number" value="{{ user['phone'] if user['phone'] else '' }}">
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label text-muted fw-bold">Availability Status</label>
+                    <div class="card bg-light border-0 p-3">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" role="switch" name="is_available" id="editSwitch" {% if user['is_available'] %}checked{% endif %}>
+                            <label class="form-check-label fw-bold ms-2" for="editSwitch">Make my profile visible to people searching for donors</label>
+                        </div>
+                        <small class="text-muted mt-2 d-block">If enabled, your partial name, blood group, pincode, and phone number (via WhatsApp link) will be public.</small>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label text-muted fw-bold">Donation History & Notes</label>
+                    <textarea name="history" class="form-control" rows="4" placeholder="Last donated on Dec 25, 2025. Available after March.">{{ user['history'] if user['history'] else '' }}</textarea>
+                </div>
+
+                <button type="submit" class="btn btn-danger btn-lg w-100 fw-bold shadow-sm">Save Changes</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

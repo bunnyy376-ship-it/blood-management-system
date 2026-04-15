@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <!-- Filters Sidebar -->
+    <div class="col-lg-4 mb-4">
+        <div class="card p-4 shadow-sm border-0 sticky-lg-top" style="top: 2rem;">
+            <h4 class="mb-3 fw-bold">Find Donors</h4>
+            <p class="text-muted small">Search for registered and available donors in your area.</p>
+            <form action="/search" method="POST">
+                <div class="mb-3">
+                    <label class="form-label fw-bold text-muted">Pincode</label>
+                    <input type="text" name="pincode" class="form-control" placeholder="Enter Pincode" required>
+                </div>
+                <div class="mb-4">
+                    <label class="form-label fw-bold text-muted">Blood Group</label>
+                    <select name="blood" class="form-select">
+                        <option value="">Any Blood Group</option>
+                        <option value="A+">A+</option>
+                        <option value="A-">A-</option>
+                        <option value="B+">B+</option>
+                        <option value="B-">B-</option>
+                        <option value="O+">O+</option>
+                        <option value="O-">O-</option>
+                        <option value="AB+">AB+</option>
+                        <option value="AB-">AB-</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-danger w-100 fw-bold">Search Now</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Results Section -->
+    <div class="col-lg-8">
+        {% if donors is not none %}
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h4 class="fw-bold">Search Results</h4>
+                <span class="badge bg-danger rounded-pill px-3 py-2">Total Found: {{ donors|length }}</span>
+            </div>
+
+            {% if donors %}
+                <div class="row g-3">
+                {% for donor in donors %}
+                    <div class="col-md-6">
+                        <div class="card p-3 shadow-sm border-0 h-100">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <h5 class="mb-0 fw-bold">{{ donor['full_name'] }}</h5>
+                                <span class="badge bg-danger fs-6">{{ donor['blood_group'] }}</span>
+                            </div>
+                            <div class="text-muted small mb-3">
+                                <div>📍 Pincode: {{ donor['pincode'] }}</div>
+                                {% if donor['history'] %}
+                                    <div class="mt-1 flex-grow-1"><small>📝 {{ donor['history'] | truncate(50) }}</small></div>
+                                {% endif %}
+                            </div>
+                            <div class="mt-auto">
+                                {% if donor['phone'] %}
+                                    <a href="https://wa.me/91{{ donor['phone'] }}" target="_blank" class="btn btn-success btn-sm w-100 fw-bold">
+                                        <i class="bi bi-whatsapp"></i> Contact on WhatsApp
+                                    </a>
+                                {% else %}
+                                    <button class="btn btn-secondary btn-sm w-100 fw-bold" disabled>No Phone Number</button>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+                </div>
+            {% else %}
+                <div class="alert alert-warning border-0 shadow-sm" role="alert">
+                    <h5 class="alert-heading fw-bold py-2 mb-0">No donors found.</h5>
+                    <p class="mb-0 text-muted">Try removing the blood group filter or expanding your search to a different pincode.</p>
+                </div>
+            {% endif %}
+        {% else %}
+            <!-- Initial State when page loads (donors is None) -->
+            <div class="card p-5 border-0 shadow-sm text-center text-muted h-100 d-flex justify-content-center align-items-center">
+                <div>
+                    <h1 class="display-1 opacity-25 mb-3">🔍</h1>
+                    <h4>Ready to Search</h4>
+                    <p>Use the filters on the left to find donors nearby.</p>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

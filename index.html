@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blood Donation Finder</title>
+    <!-- Modern Styling via Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: #f8f9fa;
+        }
+
+        .card {
+            border: none;
+            border-radius: 12-px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .blood-badge {
+            background-color: #dc3545;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Navigation Bar -->7
+    <nav class="navbar navbar-dark bg-danger mb-4">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="/">🩸 Blood Donor Registry</a>
+            <div class="d-flex align-items-center text-white">
+                <span class="me-3">Welcome, {{ session['username'] }}</span>
+                <a href="/logout" class="btn btn-outline-light btn-sm">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- Quick Action Buttons -->
+        <div class="row mb-4">
+            <div class="col-12 d-flex justify-content-center flex-wrap gap-2">
+                <a href="#find-donors" class="btn btn-danger">🔍 Find Donors</a>
+                <a href="#be-a-donor" class="btn btn-danger">❤️ Be a Donor</a>
+                <a href="#available-donors" class="btn btn-danger">📋 Available Donors</a>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Sidebar: Register & Search -->
+            <div class="col-md-4">
+                <div id="find-donors" class="card p-4 mb-4">
+                    <h4 class="mb-3">Find Donors</h4>
+                    <form action="/search" method="POST">
+                        <div class="mb-3">
+                            <input type="text" name="pincode" class="form-control" placeholder="Enter Pincode" required>
+                        </div>
+                        <div class="mb-3">
+                            <select name="blood" class="form-select">
+                                <option value="">All Blood Groups</option>
+                                <option value="A+">A+</option>
+                                <option value="A-">A-</option>
+                                <option value="B+">B+</option>
+                                <option value="B-">B-</option>
+                                <option value="O+">O+</option>
+                                <option value="O-">O-</option>
+                                <option value="AB+">AB+</option>
+                                <option value="AB-">AB-</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-danger w-100">Search Now</button>
+                    </form>
+                </div>
+
+                <div id="be-a-donor" class="card p-4">
+                    <h4 class="mb-3">Be a Donor</h4>
+                    <form action="/register" method="POST">
+                        <input type="text" name="name" class="form-control mb-2" placeholder="Full Name" required>
+                        <input type="text" name="blood" class="form-control mb-2" placeholder="Blood Group (e.g. O+)"
+                            required>
+                        <input type="tel" name="phone" class="form-control mb-2" placeholder="Phone Number" required>
+                        <input type="text" name="pincode" class="form-control mb-3" placeholder="Pincode" required>
+                        <button type="submit" class="btn btn-outline-danger w-100">Register</button>
+                    </form>
+                </div>
+
+                <!-- Share via QR -->
+                <div class="card p-4 text-center mt-4">
+                    <h5 class="mb-3">Scan to open on mobile</h5>
+                    <img id="qrcode" src="" alt="QR Code" class="img-fluid mx-auto" style="max-width: 150px;">
+                    <p class="text-muted small mt-2">Share this registry easily</p>
+                </div>
+            </div>
+
+            <!-- Main Content: Results -->
+            <div class="col-md-8">
+                <div id="available-donors" class="d-flex justify-content-between align-items-center mb-3">
+                    <h3>Available Donors</h3>
+                    <span class="badge bg-secondary">Total: {{ total }}</span>
+                </div>
+
+                {% if donors %}
+                <div class="row">
+                    {% for donor in donors %}
+                    <div class="col-md-6 mb-3">
+                        <div class="card p-3">
+                            <div class="d-flex justify-content-between">
+                                <h5 class="mb-1">{{ donor['name'] }}</h5>
+                                <span class="blood-badge">{{ donor['blood'] }}</span>
+                            </div>
+                            <p class="text-muted small">📍 Pincode: {{ donor['pincode'] }}</p>
+                            <a href="https://wa.me/91{{ donor['phone'] }}" target="_blank"
+                                class="btn btn-success btn-sm mt-2">
+                                Contact on WhatsApp
+                            </a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="alert alert-warning">No donors found for this location.</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Generate QR Code for the current website URL
+        document.addEventListener("DOMContentLoaded", function () {
+            const qrImg = document.getElementById("qrcode");
+            // Using an external API to generate the QR from the current window location
+            const currentUrl = encodeURIComponent(window.location.href);
+            qrImg.src = "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=" + currentUrl;
+        });
+    </script>
+</body>
+
+</html>
